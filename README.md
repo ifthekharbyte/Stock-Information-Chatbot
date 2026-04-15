@@ -1,4 +1,4 @@
-# Chatbot
+# Stock Information Chatbot
 
 This project runs locally with Ollama and reads configuration from `.env` when present.
 
