@@ -103,11 +103,11 @@ The chatbot now remembers the full conversation history within a session, up to 
 ### Examples
 
 ```
-You: What is your name?
-Bot: I'm your local Ollama chatbot.
+You: Compare Amazon and Microsoft.
+Bot: Looking at Amazon (AMZN) and Microsoft (MSFT), ...
 
-You: Remember that?
-Bot: Yes, I remember the earlier message in this session.
+You: What is the risk for Amazon stock?
+Bot: Amazon's risk profile looks ...
 
 You: /tokens
 Bot: Current history: ~150 tokens (limit: 1200).
