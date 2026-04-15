@@ -60,8 +60,8 @@ The chatbot uses `STOCK_API_KEY` from `.env`. It only fetches from Massive when 
 
 ### Supported pattern
 
-- `/stock AAPL`
-- Any message that includes a ticker like `AAPL`
+- `/stock AAPL/Apple`
+- Any message that includes a ticker or Company name like `AAPL/Apple`
 
 Stock responses now include:
 
