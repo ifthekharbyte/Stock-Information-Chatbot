@@ -1,6 +1,6 @@
 # Stock Information Chatbot
 
-This project runs locally with Ollama and reads configuration from `.env` when present.
+This project runs locally with Ollama and reads configuration from `.env` when present. It only answers stock information and stock-related comparison questions.
 
 ## Requirements
 
@@ -41,7 +41,7 @@ Start the Flask app to use the browser interface:
 
 Then open `http://127.0.0.1:5000` in your browser.
 
-The web UI keeps the conversation in the browser and sends each turn to Flask, which routes it to Ollama or the stock lookup logic.
+The web UI keeps the conversation in the browser and sends each turn to Flask, which routes it to Ollama or the stock lookup logic. The app only responds to stock information requests, so non-stock questions are intentionally not supported.
 
 ## Switch models
 
@@ -56,7 +56,7 @@ $env:OLLAMA_MODEL = "llama3.1:8b-instruct-q8_0"
 
 ## Massive stock lookups
 
-The chatbot uses `STOCK_API_KEY` from `.env`. It only fetches from Massive when you ask for stock info, and then caches the response locally in `stock_cache.json`.
+The chatbot uses `STOCK_API_KEY` from `.env`. It only fetches from Massive when you ask for stock information, and then caches the response locally in `stock_cache.json`.
 
 ### Supported pattern
 

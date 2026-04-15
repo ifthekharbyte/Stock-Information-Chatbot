@@ -359,19 +359,26 @@ def is_valid_stock_comparison_output(
 ) -> bool:
     text = (reply or "").strip()
     lowered = text.lower()
+    normalized_reply = normalize_company_text(text)
 
-    if len(text) < 60:
+    if len(text) < 40:
         return False
 
-    left_refs = [left_ticker.lower()]
-    right_refs = [right_ticker.lower()]
-    if left_name:
-        left_refs.extend(part.lower() for part in left_name.split()[:2])
-    if right_name:
-        right_refs.extend(part.lower() for part in right_name.split()[:2])
+    def build_name_refs(ticker: str, company_name: str) -> set[str]:
+        refs = {ticker.lower(), normalize_company_text(ticker)}
+        cleaned_name = strip_company_suffixes(company_name)
+        if company_name:
+            refs.add(normalize_company_text(company_name))
+        if cleaned_name:
+            refs.add(normalize_company_text(cleaned_name))
+            refs.update(part.lower() for part in cleaned_name.split() if len(part) > 1)
+        return {ref for ref in refs if ref}
 
-    left_ok = any(ref and ref in lowered for ref in left_refs)
-    right_ok = any(ref and ref in lowered for ref in right_refs)
+    left_refs = build_name_refs(left_ticker, left_name)
+    right_refs = build_name_refs(right_ticker, right_name)
+
+    left_ok = any(ref and (ref in lowered or ref in normalized_reply) for ref in left_refs)
+    right_ok = any(ref and (ref in lowered or ref in normalized_reply) for ref in right_refs)
     if not (left_ok and right_ok):
         return False
 
@@ -416,7 +423,11 @@ def maybe_handle_stock_comparison_request(
 
     try:
         llm_reply = generate_stock_comparison_with_ollama(prompt, ollama_model)
-    except Exception:
+    except Exception as exc:
+        if os.environ.get("STOCK_COMPARE_DEBUG", "false").strip().lower() in {"1", "true", "yes", "on"}:
+            print("\n[DEBUG] Ollama comparison request failed:")
+            print(exc)
+            print("[/DEBUG]\n")
         return fallback
 
     debug_enabled = os.environ.get("STOCK_COMPARE_DEBUG", "false").strip().lower() in {"1", "true", "yes", "on"}
@@ -428,5 +439,9 @@ def maybe_handle_stock_comparison_request(
     left_name = left_evidence.get("company", "")
     right_name = right_evidence.get("company", "")
     if not llm_reply or not is_valid_stock_comparison_output(llm_reply, left_ticker, right_ticker, left_name, right_name):
+        if os.environ.get("STOCK_COMPARE_DEBUG", "false").strip().lower() in {"1", "true", "yes", "on"}:
+            print("\n[DEBUG] Comparison output failed validation:")
+            print(llm_reply)
+            print("[/DEBUG]\n")
         return fallback
     return llm_reply
